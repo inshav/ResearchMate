@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchMate AI — SaaS Production Workspace</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #F8FAFC;
+            color: #1E293B;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Layout styling */
+        #sidebar {
+            background: linear-gradient(180deg, #1E3A8A 0%, #2563EB 100%);
+            color: white;
+            padding: 24px 20px;
+            width: 320px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #E2E8F0;
+        }
+        #sidebar h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+        .sidebar-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.15);
+            margin: 16px 0;
+        }
+        .sidebar-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #93C5FD;
+            margin-bottom: 8px;
+        }
+        .progress-container {
+            margin: 12px 0;
+        }
+        .progress-bar-bg {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+            height: 8px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background-color: #10B981;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+        .stat-line span.value {
+            font-weight: 600;
+        }
+        
+        /* Badges status layout mapping */
+        .sidebar-section-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            padding: 4px 0;
+        }
+        .badge-complete {
+            background-color: #D1FAE5;
+            color: #065F46;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 9999px;
+        }
+        .badge-pending {
+            background-color: #FEE2E2;
+            color: #991B1B;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 9999px;
+        }
+        
+        /* Main Engine Workspace Workspace Layout */
+        #workspace {
+            flex-grow: 1;
+            padding: 32px;
+            overflow-y: auto;
+            max-width: 1200px;
+        }
+        .app-header {
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+            color: white;
+            padding: 24px 28px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .app-header h1 { font-size: 1.8rem; font-weight: 700; }
+        .app-header p { font-size: 0.95rem; opacity: 0.9; margin-top: 4px; }
+        
+        .warning-banner {
+            background-color: #FEF9C3;
+            border-left: 4px solid #EAB308;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: #713F12;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        /* Operational Layout Tab Bars */
+        .tabs-header {
+            display: flex;
+            border-bottom: 2px solid #E2E8F0;
+            margin-bottom: 24px;
+            gap: 16px;
+        }
+        .tab-trigger {
+            background: none;
+            border: none;
+            padding: 12px 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748B;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .tab-trigger.active {
+            color: #2563EB;
+            border-bottom-color: #2563EB;
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Modern Cards structural blueprints */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #E2E8F0;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .card h3 { font-size: 1.15rem; color: #1E293B; margin-bottom: 16px; font-weight: 600; }
+        .card h4 { font-size: 1rem; color: #334155; margin-bottom: 12px; font-weight: 600; }
+        
+        /* Responsive CSS Row Forms Layout mapping */
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #1E293B;
+            background-color: #FFFFFF;
+            transition: border-color 0.15s ease-in-out;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        /* Action buttons layout mapping */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 18px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background-color: #2563EB;
+            color: white;
+        }
+        .btn-primary:hover { background-color: #1D4ED8; }
+        .btn-secondary {
+            background-color: white;
+            border-color: #CBD5E1;
+            color: #475569;
+        }
+        .btn-secondary:hover { background-color: #F8FAFC; border-color: #94A3B8; }
+        .btn-danger {
+            background-color: #EF4444;
+            color: white;
+        }
+        .btn-danger:hover { background-color: #DC2626; }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Expanders UI components styling */
+        .expander {
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .expander-header {
+            background-color: #F8FAFC;
+            padding: 14px 16px;
+            font-weight: 500;
+            font-size: 0.92rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .expander-content {
+            padding: 16px;
+            border-top: 1px solid #E2E8F0;
+            display: none;
+            background-color: white;
+        }
+        .expander.open .expander-content {
+            display: block;
+        }
+        
+        /* Metric box panels architecture */
+        .metric-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .metric-box {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 16px;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+        }
+        .metric-box .value { font-size: 1.6rem; font-weight: 700; color: #2563EB; }
+        .metric-box .label { font-size: 0.75rem; color: #64748B; margin-top: 4px; font-weight: 500; text-transform: uppercase; }
+        
+        /* Tables implementation */
+        .data-table-container {
+            overflow-x: auto;
+            margin: 12px 0;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+        th {
+            background-color: #F8FAFC;
+            color: #475569;
+            font-weight: 600;
+            padding: 12px 14px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #E2E8F0;
+            color: #334155;
+        }
+        td input {
+            border: none;
+            padding: 4px;
+            width: 100%;
+            background: transparent;
+        }
+        td input:focus {
+            outline: 1px solid #2563EB;
+            background: white;
+        }
+        
+        /* Risk notification labels layout elements */
+        .risk-Low { color: #16A34A; font-weight: 600; }
+        .risk-Medium { color: #D97706; font-weight: 600; }
+        .risk-High { color: #DC2626; font-weight: 600; }
+        
+        /* Sub-tab architectures */
+        .subtabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            background-color: #F1F5F9;
+            padding: 4px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+        .subtab-trigger {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #475569;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .subtab-trigger.active {
+            background-color: white;
+            color: #1E293B;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .subtab-content { display: none; }
+        .subtab-content.active { display: block; }
+        
+        pre {
+            background-color: #0F172A;
+            color: #F8FAFC;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin-top: 8px;
+        }
+        
+        .loading-spinner {
+            display: none;
+            margin-left: 12px;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <h2>ResearchMate AI</h2>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-label">Research Progress</div>
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div id="progress-bar" class="progress-bar-fill"></div>
+            </div>
+        </div>
+        <div class="stat-line">
+            <span>Readiness Score:</span>
+            <span id="side-readiness-score" class="value">0/100</span>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        <div class="stat-line">
+            <span>Sections Completed:</span>
+            <span id="side-sections-count" class="value">0/7</span>
+        </div>
+        <div class="stat-line">
+            <span>Estimated Pages:</span>
+            <span id="side-page-estimate" class="value">0.0</span>
+        </div>
+        <div class="stat-line">
+            <span>References Added:</span>
+            <span id="side-references-count" class="value">0</span>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-label">Section Badges</div>
+        <div id="sidebar-sections-list"></div>
+        
+        <div class="sidebar-divider"></div>
+        <div class="stat-line">
+            <span>Export Status:</span>
+            <span id="side-export-status" class="value" style="color: #EF4444; font-weight: 600;">Incomplete</span>
+        </div>
+    </div>
+
+    <div id="workspace">
+        <div class="app-header">
+            <h1>ResearchMate AI</h1>
+            <p>AI-Assisted Research Paper Builder</p>
+        </div>
+        <div class="warning-banner">
+            <strong>Academic Integrity Notice:</strong> AI assists your research process. You remain completely responsible for academic integrity, structural originality, data accuracy, and rigorous citation verification before submitting your work.
+        </div>
+        
+        <div class="tabs-header">
+            <button class="tab-trigger active" onclick="switchTab('setup-tab')">Research Setup</button>
+            <button class="tab-trigger" onclick="switchTab('lit-tab')">Literature Review</button>
+            <button class="tab-trigger" onclick="switchTab('builder-tab')">Paper Builder</button>
+            <button class="tab-trigger" onclick="switchTab('validation-tab')">Validation</button>
+            <button class="tab-trigger" onclick="switchTab('export-tab')">Export</button>
+        </div>
+
+        <div id="setup-tab" class="tab-content active">
+            <div class="card">
+                <h3>Research Parameters</h3>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label>Research Title</label>
+                        <input type="text" id="setup-title" placeholder="e.g. Deep Learning for Medical Image Segmentation">
+                    </div>
+                    <div class="form-group">
+                        <label>Research Objective</label>
+                        <textarea id="setup-objective" rows="3" placeholder="What problem are you solving and what is your proposed approach?"></textarea>
+                    </div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label>Research Domain</label>
+                        <input type="text" id="setup-domain" placeholder="e.g. Computer Science / Biomedical Engineering">
+                    </div>
+                    <div class="form-group">
+                        <label>Target Journal / Conference</label>
+                        <input type="text" id="setup-journal" placeholder="e.g. IEEE Transactions on Medical Imaging">
+                    </div>
+                </div>
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label>Formatting Style</label>
+                        <select id="setup-format">
+                            <option value="IEEE">IEEE</option>
+                            <option value="Springer">Springer</option>
+                            <option value="Elsevier">Elsevier</option>
+                            <option value="College Format">College Format</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Page Limit</label>
+                        <input type="number" id="setup-pagelimit" value="8" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Character Limit (Abstract)</label>
+                        <input type="number" id="setup-charlimit" value="1500" min="100" max="2000">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Keywords (comma-separated)</label>
+                    <input type="text" id="setup-keywords" placeholder="e.g. deep learning, CNN, segmentation">
+                </div>
+                
+                <div style="margin-top: 24px;">
+                    <h4>Authors Management</h4>
+                    <div class="form-group" style="width: 160px; margin-bottom: 12px;">
+                        <label>Number of Authors</label>
+                        <input type="number" id="authors-count" value="1" min="1" max="10" onchange="adjustAuthorsCount()">
+                    </div>
+                    <div id="authors-container"></div>
+                </div>
+                
+                <div style="margin-top: 20px; display: flex; align-items: center;">
+                    <button class="btn btn-secondary" onclick="saveSetupConfig()">Save Setup</button>
+                    <button class="btn btn-primary" id="btn-gen-plan" style="margin-left: 12px;" onclick="triggerGeneratePlan()">Generate Research Plan</button>
+                    <span id="setup-spinner" class="loading-spinner">Processing payload matrix...</span>
+                </div>
+            </div>
+            
+            <div id="research-plan-card" class="card" style="display: none;">
+                <h3>Suggested Research Plan</h3>
+                <div id="plan-structured-content"></div>
+            </div>
+        </div>
+
+        <div id="lit-tab" class="tab-content">
+            <div class="card">
+                <h3>Literature Upload & Core Engine Extractor</h3>
+                <div class="warning-banner">
+                    ⚠️ AI parser systems may misinterpret specific semantic contexts within uploaded documents. Verify all extracted analytical insights manually before inclusion.
+                </div>
+                <div class="form-group">
+                    <label>Upload Research Papers (PDF Format)</label>
+                    <input type="file" id="lit-files" accept=".pdf" multiple>
+                </div>
+                <div style="margin-top: 12px; display: flex; align-items: center;">
+                    <button class="btn btn-primary" onclick="triggerAnalyzePapers()">Extract & Analyze Papers</button>
+                    <span id="lit-spinner" class="loading-spinner">Running PyMuPDF structural extraction and mapping profiles...</span>
+                </div>
+            </div>
+            
+            <div id="summaries-wrapper-card" class="card" style="display: none;">
+                <h3>Extracted Paper Summaries</h3>
+                <div id="summaries-container"></div>
+            </div>
+            
+            <div class="card">
+                <h3>Literature Review Table</h3>
+                <p style="font-size: 0.85rem; color: #64748B; margin-bottom: 12px;">Modify rows or fields directly within the schema spreadsheet editor grid below:</p>
+                <div class="data-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Paper</th>
+                                <th>Year</th>
+                                <th>Method</th>
+                                <th>Dataset</th>
+                                <th>Findings</th>
+                                <th>Limitations</th>
+                                <th style="width: 60px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lit-table-body"></tbody>
+                    </table>
+                </div>
+                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="addManualTableGridRow()">Add Manual Row</button>
+            </div>
+            
+            <div class="card">
+                <h3>Add Citation Target</h3>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label>DOI String</label>
+                        <input type="text" id="cite-doi" placeholder="e.g. 10.1109/TMI.2023.1234567">
+                    </div>
+                    <div class="form-group">
+                        <label>URL Reference Address</label>
+                        <input type="text" id="cite-url" placeholder="https://arxiv.org/abs/...">
+                    </div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label>Citation Style Format</label>
+                        <select id="cite-style">
+                            <option value="APA">APA</option>
+                            <option value="IEEE">IEEE</option>
+                            <option value="MLA">MLA</option>
+                            <option value="BibTeX">BibTeX</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Manual Reference Entry Text Block (Fallback Paste)</label>
+                    <textarea id="cite-manual" rows="2" placeholder="Paste structural reference citations to construct semantic bibtex payloads..."></textarea>
+                </div>
+                <div style="margin-top: 12px; display: flex; align-items: center;">
+                    <button class="btn btn-primary" onclick="triggerGenerateCitation()">Generate Citation</button>
+                    <span id="cite-spinner" class="loading-spinner">Structuring BibTeX mapping block...</span>
+                </div>
+                
+                <div id="saved-citations-section" style="margin-top: 24px; display: none;">
+                    <h4>Saved Citations & Reference Lists</h4>
+                    <div class="warning-banner" style="margin-top: 8px; margin-bottom: 12px;">
+                        ⚠️ Verify structural citation mapping strings. Generative algorithms might synthesize erroneous bibliographies or references.
+                    </div>
+                    <div id="citations-list-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="builder-tab" class="tab-content">
+            <div class="card">
+                <h3>Section Draft Assembly</h3>
+                <p style="font-size: 0.85rem; color: #475569; margin-bottom: 16px;">
+                    Provide draft components for individual categories. Use the AI suite to optimize structural syntax. 
+                    <strong style="color: #2563EB;">A baseline word threshold of 50 units is required to execute AI formatting optimization workflows.</strong>
+                </p>
+                
+                <div id="sections-builder-container"></div>
+            </div>
+            
+            <div class="card">
+                <h3>Figures & Document Tables Assets</h3>
+                <div class="form-group">
+                    <label>Upload Diagrams / Graphical Assets</label>
+                    <input type="file" id="figure-file-input" accept="image/*,.svg,.pdf" onchange="triggerUploadFigure()">
+                </div>
+                <div id="figure-upload-spinner" class="loading-spinner" style="margin-bottom: 12px;">Synthesizing LaTeX layout tags and caption metadata...</div>
+                <div id="figures-gallery-container"></div>
+            </div>
+        </div>
+
+        <div id="validation-tab" class="tab-content">
+            <div class="card">
+                <h3>Draft Metrics and Validation Controls</h3>
+                <div class="metric-row">
+                    <div class="metric-box">
+                        <div class="value" id="val-m-score">0/100</div>
+                        <div class="label">Readiness Score</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="value" id="val-m-sections">0/7</div>
+                        <div class="label">Sections Completed</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="value" id="val-m-refs">0</div>
+                        <div class="label">Citations</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="value" id="val-m-pages">0.0</div>
+                        <div class="label">Est. Pages</div>
+                    </div>
+                </div>
+                
+                <h4>Section Coverage Grid Checklists</h4>
+                <div class="data-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Section Node</th>
+                                <th>Completion Status</th>
+                                <th>Current Word Metric</th>
+                                <th>Strategic Weight Mapping</th>
+                            </tr>
+                        </thead>
+                        <tbody id="validation-checklist-table"></tbody>
+                    </table>
+                </div>
+                <div id="validation-warnings-box" style="margin-top: 12px;"></div>
+                
+                <div style="margin-top: 24px; border-top: 1px solid #E2E8F0; padding-top: 20px;">
+                    <h4>AI Peer-Review & Integrity Analysis Report</h4>
+                    <p style="font-size: 0.85rem; color: #475569; margin-bottom: 12px;">Evaluate synthesized components relative to context reference models to flag potential factual drifts or logical fallacies.</p>
+                    <div style="display: flex; align-items: center;">
+                        <button class="btn btn-primary" onclick="triggerRunValidationReport()">Run Validation Analysis</button>
+                        <span id="validation-spinner" class="loading-spinner">Evaluating internal section text metrics against reference sets...</span>
+                    </div>
+                    
+                    <div id="validation-results-render-block" style="margin-top: 20px; display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="export-tab" class="tab-content">
+            <div class="card">
+                <h3>Compile & Package Distribution Manifests</h3>
+                <p style="font-size: 0.9rem; color: #475569; margin-bottom: 16px;">Download encapsulated assets structured cleanly for instant compilation inside Overleaf processing environments.</p>
+                
+                <div class="form-grid-2">
+                    <div class="card" style="background-color: #F8FAFC; margin-bottom: 0;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: #64748B;">Layout Specification Target</span>
+                        <div style="font-size: 1.2rem; font-weight: 600; margin-top: 4px; color: #1E293B;" id="exp-card-format">IEEE Style Template</div>
+                    </div>
+                    <div class="card" style="background-color: #F8FAFC; margin-bottom: 0;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: #64748B;">Assembly Verification Summary</span>
+                        <div style="font-size: 1.2rem; font-weight: 600; margin-top: 4px; color: #1E293B;" id="exp-card-status">0 / 7 Component Sets Fixed</div>
+                    </div>
+                </div>
+                <div class="form-grid-2" style="margin-top: 16px;">
+                    <div class="card" style="background-color: #F8FAFC; margin-bottom: 0;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: #64748B;">Bibliography Indexes Found</span>
+                        <div style="font-size: 1.2rem; font-weight: 600; margin-top: 4px; color: #1E293B;" id="exp-card-refs">0 Entries Ingestion Ready</div>
+                    </div>
+                    <div class="card" style="background-color: #F8FAFC; margin-bottom: 0;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: #64748B;">Diagram Attachments Packaged</span>
+                        <div style="font-size: 1.2rem; font-weight: 600; margin-top: 4px; color: #1E293B;" id="exp-card-figs">0 Structural Objects Registered</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 24px;">
+                    <h4>Pre-Compilation Distribution Previews</h4>
+                    <div class="subtabs">
+                        <button class="subtab-trigger active" onclick="switchSubTab('prev-tex')">main.tex</button>
+                        <button class="subtab-trigger" onclick="switchSubTab('prev-bib')">references.bib</button>
+                        <button class="subtab-trigger" onclick="switchSubTab('prev-meta')">metadata.json</button>
+                    </div>
+                    <div id="prev-tex" class="subtab-content active"><pre id="code-preview-tex">% Run generation workflows to fill text nodes...</pre></div>
+                    <div id="prev-bib" class="subtab-content"><pre id="code-preview-bib">% No explicit reference elements declared yet...</pre></div>
+                    <div id="prev-meta" class="subtab-content"><pre id="code-preview-meta">{}</pre></div>
+                </div>
+                
+                <div style="margin-top: 24px; border-top: 1px solid #E2E8F0; padding-top: 20px;">
+                    <button class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem;" onclick="triggerExportZipArchive()">Generate ZIP Package</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Overleaf Environments Deployment Runbook</h3>
+                <ol style="margin-left: 20px; font-size: 0.9rem; color: #334155; line-height: 1.6;">
+                    <li>Navigate to the cloud processing space at <a href="https://overleaf.com" target="_blank" style="color: #2563EB; font-weight: 500;">overleaf.com</a> and sign in.</li>
+                    <li>Initialize a blank project tree via the **Upload Project** option.</li>
+                    <li>Drop the exported file (`ResearchProject.zip`) directly into the pipeline selector.</li>
+                    <li>Verify the master index compilation file target points explicitly to `main.tex`.</li>
+                    <li>Execute the compilation pipeline using the **pdfLaTeX** compiler setup engine.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let appState = {
+            setup: {
+                title: "", domain: "", keywords: "", objective: "",
+                journal: "", format_style: "IEEE", page_limit: 8, char_limit: 1500
+            },
+            research_plan: {},
+            authors: [{name: "", designation: "", department: "", college: "", email: ""}],
+            lit_papers: [],
+            lit_table: [],
+            sections: {abstract: "", introduction: "", literature_review: "", methodology: "", results: "", discussion: "", conclusion: ""},
+            section_user_drafts: {abstract: "", introduction: "", literature_review: "", methodology: "", results: "", discussion: "", conclusion: ""},
+            citations: [],
+            figures: [],
+            validation_result: {}
+        };
+
+        const SECTION_KEYS_LIST = ["abstract", "introduction", "literature_review", "methodology", "results", "discussion", "conclusion"];
+        const SECTION_LABELS_MAP = {
+            abstract: "Abstract", introduction: "Introduction", literature_review: "Literature Review",
+            methodology: "Methodology", results: "Results & Analysis", discussion: "Discussion", conclusion: "Conclusion"
+        };
+        const SECTION_WEIGHTS_MAP = { abstract: 15, introduction: 15, literature_review: 15, methodology: 20, results: 15, discussion: 10, conclusion: 10 };
+
+        // Core App Lifecycle Methods
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAuthorsInputForms();
+            renderBuilderSectionsBlock();
+            refreshStateIndicatorsUI();
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-trigger').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            // Highlight the corresponding tab button
+            const idx = ['setup-tab', 'lit-tab', 'builder-tab', 'validation-tab', 'export-tab'].indexOf(tabId);
+            if(idx !== -1) document.querySelectorAll('.tab-trigger')[idx].classList.add('active');
+            
+            if(tabId === 'validation-tab' || tabId === 'export-tab') {
+                refreshStateIndicatorsUI();
+                renderValidationChecklist();
+                updateExportPreviews();
+            }
+        }
+
+        function switchSubTab(subTabId) {
+            document.querySelectorAll('.subtab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.subtab-trigger').forEach(el => el.classList.remove('active'));
+            document.getElementById(subTabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleExpanderNode(headerElement) {
+            headerElement.parentElement.classList.toggle('open');
+        }
+
+        // Global State Evaluation Metrics Calculations
+        function getWordCount(text) {
+            return text && text.trim() ? text.trim().split(/\s+/).length : 0;
+        }
+
+        function countCompletedSections() {
+            return Object.values(appState.sections).filter(val => val && val.trim().length > 0).length;
+        }
+
+        function getEstPages() {
+            let totalWords = 0;
+            Object.values(appState.sections).forEach(v => { totalWords += getWordCount(v); });
+            return (totalWords / 250).toFixed(1);
+        }
+
+        function calculateMetricsScore() {
+            let score = 0;
+            if (appState.setup.title) score += 10;
+            if (appState.setup.objective) score += 10;
+            if (appState.research_plan && Object.keys(appState.research_plan).length > 0 && !appState.research_plan.raw) score += 10;
+            if (appState.lit_table && appState.lit_table.length > 0) score += 10;
+            if (appState.citations && appState.citations.length >= 5) score += 10;
+            
+            let completedCount = countCompletedSections();
+            score += Math.floor((completedCount / 7) * 40);
+            if (appState.validation_result && Object.keys(appState.validation_result).length > 0 && !appState.validation_result.raw) score += 10;
+            return Math.min(score, 100);
+        }
+
+        // Refresh UI components across global layout nodes
+        function refreshStateIndicatorsUI() {
+            const currentScore = calculateMetricsScore();
+            const completedCount = countCompletedSections();
+            const pagesEst = getEstPages();
+            const referencesCount = appState.citations.length;
+
+            // Update local structural dashboard sidebar references
+            document.getElementById('progress-bar').style.width = `${currentScore}%`;
+            document.getElementById('side-readiness-score').innerText = `${currentScore}/100`;
+            document.getElementById('side-sections-count').innerText = `${completedCount}/7`;
+            document.getElementById('side-page-estimate').innerText = pagesEst;
+            document.getElementById('side-references-count').innerText = referencesCount;
+
+            const exportStatusEl = document.getElementById('side-export-status');
+            if(completedCount >= 4) {
+                exportStatusEl.innerText = "Ready";
+                exportStatusEl.style.color = "#10B981";
+            } else {
+                exportStatusEl.innerText = "Incomplete";
+                exportStatusEl.style.color = "#EF4444";
+            }
+
+            // Update baseline checklist tab metrics dynamically
+            document.getElementById('val-m-score').innerText = `${currentScore}/100`;
+            document.getElementById('val-m-sections').innerText = `${completedCount}/7`;
+            document.getElementById('val-m-refs').innerText = referencesCount;
+            document.getElementById('val-m-pages').innerText = pagesEst;
+
+            // Re-render structural visual badges list in the layout sidebar bounds
+            const badgeContainer = document.getElementById('sidebar-sections-list');
+            badgeContainer.innerHTML = '';
+            SECTION_KEYS_LIST.forEach(k => {
+                const isDone = appState.sections[k] && appState.sections[k].trim().length > 0;
+                const bHtml = isDone ? '<span class="badge-complete">Done</span>' : '<span class="badge-pending">Pending</span>';
+                const row = document.createElement('div');
+                row.className = 'sidebar-section-item';
+                row.innerHTML = `<span>${SECTION_LABELS_MAP[k]}</span>${bHtml}`;
+                badgeContainer.appendChild(row);
+            });
+
+            // Update display elements within Export tab panels
+            document.getElementById('exp-card-format').innerText = `${appState.setup.format_style || 'IEEE'} Template`;
+            document.getElementById('exp-card-status').innerText = `${completedCount} / 7 Component Nodes Fixed`;
+            document.getElementById('exp-card-refs').innerText = `${referencesCount} Entries Ingestion Ready`;
+            document.getElementById('exp-card-figs').innerText = `${appState.figures.length} Structural Objects Registered`;
+        }
+
+        // Tab 1 Operational Processing Routines
+        function adjustAuthorsCount() {
+            const targetCount = parseInt(document.getElementById('authors-count').value) || 1;
+            while(appState.authors.length < targetCount) {
+                appState.authors.push({name: "", designation: "", department: "", college: "", email: ""});
+            }
+            while(appState.authors.length > targetCount) {
+                appState.authors.pop();
+            }
+            renderAuthorsInputForms();
+        }
+
+        function renderAuthorsInputForms() {
+            const container = document.getElementById('authors-container');
+            container.innerHTML = '';
+            appState.authors.forEach((author, i) => {
+                const card = document.createElement('div');
+                card.className = 'expander open';
+                card.style.borderColor = '#CBD5E1';
+                card.innerHTML = `
+                    <div class="expander-header" onclick="toggleExpanderNode(this)">
+                        <span>Author #${i+1}: ${author.name || 'Unnamed Record'}</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="expander-content">
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="auth-name-${i}" value="${author.name || ''}" oninput="syncAuthorsState(${i})">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Profile</label>
+                                <input type="text" id="auth-email-${i}" value="${author.email || ''}" oninput="syncAuthorsState(${i})">
+                            </div>
+                            <div class="form-group">
+                                <label>Designation Context</label>
+                                <input type="text" id="auth-desig-${i}" value="${author.designation || ''}" placeholder="e.g. Research Scholar" oninput="syncAuthorsState(${i})">
+                            </div>
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label>Department Branch</label>
+                                <input type="text" id="auth-dept-${i}" value="${author.department || ''}" oninput="syncAuthorsState(${i})">
+                            </div>
+                            <div class="form-group">
+                                <label>Institution / College</label>
+                                <input type="text" id="auth-college-${i}" value="${author.college || ''}" oninput="syncAuthorsState(${i})">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function syncAuthorsState(i) {
+            appState.authors[i] = {
+                name: document.getElementById(`auth-name-${i}`).value,
+                email: document.getElementById(`auth-email-${i}`).value,
+                designation: document.getElementById(`auth-desig-${i}`).value,
+                department: document.getElementById(`auth-dept-${i}`).value,
+                college: document.getElementById(`auth-college-${i}`).value
+            };
+        }
+
+        function captureFormSetupInputs() {
+            appState.setup = {
+                title: document.getElementById('setup-title').value,
+                objective: document.getElementById('setup-objective').value,
+                domain: document.getElementById('setup-domain').value,
+                journal: document.getElementById('setup-journal').value,
+                format_style: document.getElementById('setup-format').value,
+                page_limit: parseInt(document.getElementById('setup-pagelimit').value) || 8,
+                char_limit: parseInt(document.getElementById('setup-charlimit').value) || 1500,
+                keywords: document.getElementById('setup-keywords').value
+            };
+        }
+
+        function saveSetupConfig() {
+            captureFormSetupInputs();
+            refreshStateIndicatorsUI();
+            alert("Configuration settings synchronized successfully.");
+        }
+
+        async function triggerGeneratePlan() {
+            captureFormSetupInputs();
+            if(!appState.setup.title || !appState.setup.objective) {
+                alert("Please provide both a Title and Objective statement before planning.");
+                return;
+            }
+            
+            const spinner = document.getElementById('setup-spinner');
+            spinner.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch('/api/generate_plan', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({setup: appState.setup})
+                });
+                const resData = await response.json();
+                if(resData.error) {
+                    alert(resData.error);
+                } else {
+                    appState.research_plan = resData.research_plan;
+                    displayResearchPlanUI();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Pipeline execution failure while contacting server planning routines.");
+            } finally {
+                spinner.style.display = 'none';
+                refreshStateIndicatorsUI();
+            }
+        }
+
+        function displayResearchPlanUI() {
+            const cardBlock = document.getElementById('research-plan-card');
+            const targetContent = document.getElementById('plan-structured-content');
+            cardBlock.style.display = 'block';
+            
+            const rp = appState.research_plan;
+            if(rp.raw) {
+                targetContent.innerHTML = `<pre>${rp.raw}</pre>`;
+            } else {
+                let structItems = '';
+                if(rp.structure && Array.isArray(rp.structure)) {
+                    structItems = `<ul>${rp.structure.map(s => `<li>${s}</li>`).join('')}</ul>`;
+                }
+                targetContent.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <div class="card" style="background: #F8FAFC; padding: 14px;"><strong>Research Scope:</strong><p style="font-size:0.9rem; margin-top:6px; color:#475569;">${rp.scope || ''}</p></div>
+                            <div class="card" style="background: #F8FAFC; padding: 14px;"><strong>Research Gap:</strong><p style="font-size:0.9rem; margin-top:6px; color:#475569;">${rp.gap || ''}</p></div>
+                        </div>
+                        <div>
+                            <div class="card" style="background: #F8FAFC; padding: 14px;"><strong>Suggested Methodology:</strong><p style="font-size:0.9rem; margin-top:6px; color:#475569;">${rp.methodology || ''}</p></div>
+                            <div class="card" style="background: #F8FAFC; padding: 14px;"><strong>Suggested Paper Structure:</strong><div style="font-size:0.9rem; margin-top:6px; color:#475569;">${structItems}</div></div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Tab 2 Literature Context Functions
+        async function triggerAnalyzePapers() {
+            const fileInput = document.getElementById('lit-files');
+            if(fileInput.files.length === 0) {
+                alert("Please attach at least one valid PDF document artifact to proceed.");
+                return;
+            }
+            
+            const spinner = document.getElementById('lit-spinner');
+            spinner.style.display = 'inline-block';
+            
+            const formData = new FormData();
+            for(let i=0; i<fileInput.files.length; i++) {
+                formData.append('files', fileInput.files[i]);
+            }
+            
+            try {
+                const response = await fetch('/api/analyze_papers', {
+                    method: 'POST',
+                    body: formData
+                });
+                const resData = await response.json();
+                if(resData.error) {
+                    alert(resData.error);
+                } else {
+                    appState.lit_papers = appState.lit_papers.concat(resData.lit_papers);
+                    appState.lit_table = appState.lit_table.concat(resData.lit_table);
+                    renderLitSummariesInterface();
+                    syncLitTableToInterfaceGrid();
+                }
+            } catch(e) {
+                console.error(e);
+                alert("Fatal exception communicating through paper analysis background channels.");
+            } finally {
+                spinner.style.display = 'none';
+                refreshStateIndicatorsUI();
+            }
+        }
+
+        function renderLitSummariesInterface() {
+            const wrapper = document.getElementById('summaries-wrapper-card');
+            const container = document.getElementById('summaries-container');
+            if(appState.lit_papers.length === 0) {
+                wrapper.style.display = 'none';
+                return;
+            }
+            wrapper.style.display = 'block';
+            container.innerHTML = '';
+            
+            appState.lit_papers.forEach((p, idx) => {
+                const subNode = document.createElement('div');
+                subNode.className = 'expander';
+                subNode.innerHTML = `
+                    <div class="expander-header" onclick="toggleExpanderNode(this)">
+                        <span>📄 ${p.title || p.filename}</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="expander-content" style="font-size: 0.9rem; line-height:1.5;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:10px;">
+                            <div><strong>Authors:</strong> ${p.authors || 'N/A'}</div>
+                            <div><strong>Year:</strong> ${p.year || 'N/A'}</div>
+                            <div><strong>Keywords:</strong> ${p.keywords || 'N/A'}</div>
+                            <div><strong>Methodology:</strong> ${p.methodology || 'N/A'}</div>
+                            <div><strong>Dataset Context:</strong> ${p.dataset || 'N/A'}</div>
+                        </div>
+                        <div style="margin-top:8px;"><strong>Summary Target:</strong> <p style="color:#475569;">${p.summary || 'N/A'}</p></div>
+                        <div style="margin-top:8px;"><strong>Core Findings:</strong> <p style="color:#475569;">${p.findings || 'N/A'}</p></div>
+                        <div style="margin-top:8px;"><strong>Stated Limitations:</strong> <p style="color:#475569;">${p.limitations || 'N/A'}</p></div>
+                    </div>
+                `;
+                container.appendChild(subNode);
+            });
+        }
+
+        function syncLitTableToInterfaceGrid() {
+            const body = document.getElementById('lit-table-body');
+            body.innerHTML = '';
+            appState.lit_table.forEach((row, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" value="${row.Paper || ''}" oninput="updateLitTableRowMemory(${i}, 'Paper', this.value)"></td>
+                    <td><input type="text" value="${row.Year || ''}" oninput="updateLitTableRowMemory(${i}, 'Year', this.value)"></td>
+                    <td><input type="text" value="${row.Method || ''}" oninput="updateLitTableRowMemory(${i}, 'Method', this.value)"></td>
+                    <td><input type="text" value="${row.Dataset || ''}" oninput="updateLitTableRowMemory(${i}, 'Dataset', this.value)"></td>
+                    <td><input type="text" value="${row.Findings || ''}" oninput="updateLitTableRowMemory(${i}, 'Findings', this.value)"></td>
+                    <td><input type="text" value="${row.Limitations || ''}" oninput="updateLitTableRowMemory(${i}, 'Limitations', this.value)"></td>
+                    <td><button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="removeLitTableRowNode(${i})">Drop</button></td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function updateLitTableRowMemory(i, key, val) {
+            appState.lit_table[i][key] = val;
+        }
+
+        function addManualTableGridRow() {
+            appState.lit_table.push({"Paper":"","Year":"","Method":"","Dataset":"","Findings":"","Limitations":""});
+            syncLitTableToInterfaceGrid();
+        }
+
+        function removeLitTableRowNode(i) {
+            appState.lit_table.splice(i, 1);
+            syncLitTableToInterfaceGrid();
+            refreshStateIndicatorsUI();
+        }
+
+        async function triggerGenerateCitation() {
+            const doi = document.getElementById('cite-doi').value;
+            const url = document.getElementById('cite-url').value;
+            const manual = document.getElementById('cite-manual').value;
+            const style = document.getElementById('cite-style').value;
+            
+            const sourceStr = doi || url || manual;
+            if(!sourceStr) {
+                alert("Please declare a DOI pointer string, URL path, or a structural text payload block.");
+                return;
+            }
+            
+            const spinner = document.getElementById('cite-spinner');
+            spinner.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch('/api/generate_citation', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({source: sourceStr, style: style})
+                });
+                const resData = await response.json();
+                if(resData.error) {
+                    alert(resData.error);
+                } else {
+                    appState.citations.push(resData.citation);
+                    renderSavedCitationsCollection();
+                }
+            } catch(ex) {
+                console.error(ex);
+                alert("Error handling execution paths for formatting bibliography indexes.");
+            } finally {
+                spinner.style.display = 'none';
+                refreshStateIndicatorsUI();
+            }
+        }
+
+        function renderSavedCitationsCollection() {
+            const section = document.getElementById('saved-citations-section');
+            const container = document.getElementById('citations-list-container');
+            if(appState.citations.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = 'block';
+            container.innerHTML = '';
+            
+            appState.citations.forEach((c, i) => {
+                const card = document.createElement('div');
+                card.className = 'expander';
+                let codeBlock = c.bibtex ? `<pre style="margin-top:8px; background:#1E293B;">${c.bibtex}</pre>` : '';
+                card.innerHTML = `
+                    <div class="expander-header" onclick="toggleExpanderNode(this)">
+                        <span>Citation #${i+1} [${c.style || 'RAW'}]</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="expander-content">
+                        <p style="font-size:0.9rem; color:#334155;">${c.formatted || ''}</p>
+                        ${codeBlock}
+                        <button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem; margin-top:8px;" onclick="removeCitationEntryElement(${i})">Remove Reference</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function removeCitationEntryElement(i) {
+            appState.citations.splice(i, 1);
+            renderSavedCitationsCollection();
+            refreshStateIndicatorsUI();
+        }
+
+        // Tab 3 Comprehensive Paper Drafting Systems
+        function renderBuilderSectionsBlock() {
+            const container = document.getElementById('sections-builder-container');
+            container.innerHTML = '';
+            
+            SECTION_KEYS_LIST.forEach(k => {
+                const isDone = appState.sections[k] && appState.sections[k].trim().length > 0;
+                const draftVal = appState.section_user_drafts[k] || '';
+                const finalVal = appState.sections[k] || '';
+                
+                const currentWc = getWordCount(draftVal);
+                const canOptimize = currentWc >= 50;
+                
+                const block = document.createElement('div');
+                block.className = `expander ${!isDone ? 'open' : ''}`;
+                
+                let aiResponseWorkspace = '';
+                if(finalVal) {
+                    aiResponseWorkspace = `
+                        <div style="margin-top:14px; border-top:1px dashed #CBD5E1; padding-top:12px;">
+                            <label style="font-size:0.82rem; font-weight:600; color:#1E293B;">AI-Optimized & Refined Composition Layer</label>
+                            <textarea id="final-textarea-${k}" rows="8" style="margin-top:6px; background:#FAFAFA;" oninput="syncFinalTextNodeMemory('${k}')">${finalVal}</textarea>
+                            <span style="font-size:0.75rem; color:#64748B;">Optimized Version Word Metric Count: ${getWordCount(finalVal)}</span>
+                        </div>
+                    `;
+                }
+
+                block.innerHTML = `
+                    <div class="expander-header" onclick="toggleExpanderNode(this)">
+                        <strong>${SECTION_LABELS_MAP[k]} Context Node</strong>
+                        <span>▼</span>
+                    </div>
+                    <div class="expander-content">
+                        <div class="form-group">
+                            <label>Provide your active raw source text draft components below:</label>
+                            <textarea id="draft-textarea-${k}" rows="6" placeholder="Write or insert rough draft profiles here... Minimum 50 words required to unlock AI assistance tools." oninput="syncDraftInputMemory('${k}')">${draftVal}</textarea>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px;">
+                            <span style="font-size:0.78rem; color:${canOptimize ? '#10B981' : '#64748B'}; font-weight:500;">
+                                Word Metric Tracking: ${currentWc} ${canOptimize ? '✓ Threshold Met' : '— Needs ' + (50 - currentWc) + ' additional words'}
+                            </span>
+                            <button class="btn btn-primary" style="padding:6px 14px; font-size:0.8rem;" id="btn-optimize-${k}" ${!canOptimize ? 'disabled' : ''} onclick="triggerAIOptimizeSection('${k}')">AI Improve</button>
+                        </div>
+                        <div id="ai-spinner-${k}" class="loading-spinner" style="margin-top:8px;">Running structural linguistic checks via Gemini Engine layers...</div>
+                        ${aiResponseWorkspace}
+                    </div>
+                `;
+                container.appendChild(block);
+            });
+        }
+
+        function syncDraftInputMemory(k) {
+            const txt = document.getElementById(`draft-textarea-${k}`).value;
+            appState.section_user_drafts[k] = txt;
+            
+            // Check dynamic changes to block parameters and refresh without wiping focus elements completely
+            const currentWc = getWordCount(txt);
+            const btn = document.getElementById(`btn-optimize-${k}`);
+            if(btn) btn.disabled = (currentWc < 50);
+        }
+
+        function syncFinalTextNodeMemory(k) {
+            appState.sections[k] = document.getElementById(`final-textarea-${k}`).value;
+        }
+
+        async function triggerAIOptimizeSection(k) {
+            captureFormSetupInputs();
+            const draftText = appState.section_user_drafts[k];
+            if(!draftText || getWordCount(draftText) < 50) {
+                alert("Draft word count falls beneath minimum evaluation threshold constraints.");
+                return;
+            }
+            
+            const spinner = document.getElementById(`ai-spinner-${k}`);
+            if(spinner) spinner.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch('/api/improve_section', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        sec_key: k,
+                        user_draft: draftText,
+                        setup: appState.setup,
+                        lit_papers: appState.lit_papers
+                    })
+                });
+                const resData = await response.json();
+                if(resData.error) {
+                    alert(resData.error);
+                } else {
+                    appState.sections[k] = resData.improved_text;
+                    renderBuilderSectionsBlock();
+                }
+            } catch(ex) {
+                console.error(ex);
+                alert("Connection loss during section rewrite pipeline execution loops.");
+            } finally {
+                if(spinner) spinner.style.display = 'none';
+                refreshStateIndicatorsUI();
+            }
+        }
+
+        async function triggerUploadFigure() {
+            const input = document.getElementById('figure-file-input');
+            if(input.files.length === 0) return;
+            
+            captureFormSetupInputs();
+            const spinner = document.getElementById('figure-upload-spinner');
+            spinner.style.display = 'inline-block';
+            
+            const fileObj = input.files[0];
+            const formData = new FormData();
+            formData.append('file', fileObj);
+            formData.append('setup', JSON.stringify(appState.setup));
+            formData.append('current_count', appState.figures.length);
+            
+            try {
+                const response = await fetch('/api/upload_figure', {
+                    method: 'POST',
+                    body: formData
+                });
+                const resData = await response.json();
+                if(resData.error) {
+                    alert(resData.error);
+                } else {
+                    appState.figures.push(resData.figure);
+                    renderFiguresGalleryUI();
+                }
+            } catch(e) {
+                console.error(e);
+                alert("Error handling multipart packaging transmission parameters.");
+            } finally {
+                spinner.style.display = 'none';
+                input.value = ''; // clear selector paths
+                refreshStateIndicatorsUI();
+            }
+        }
+
+        function renderFiguresGalleryUI() {
+            const container = document.getElementById('figures-gallery-container');
+            container.innerHTML = '';
+            if(appState.figures.length === 0) return;
+            
+            appState.figures.forEach((f, idx) => {
+                const node = document.createElement('div');
+                node.className = 'expander';
+                let imgTag = f.mimetype.startsWith('image/') ? `<img src="data:${f.mimetype};base64,${f.b64}" style="max-width:100%; max-height:240px; object-fit:contain; border:1px solid #E2E8F0; border-radius:6px; margin-bottom:10px;">` : '';
+                node.innerHTML = `
+                    <div class="expander-header" onclick="toggleExpanderNode(this)">
+                        <span>Figure #${idx+1}: ${f.filename}</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="expander-content">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                            <div>
+                                ${imgTag}
+                                <p style="font-size:0.85rem; color:#475569;"><strong>Caption Target:</strong> ${f.caption}</p>
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:600;">LaTeX Reference Code Block</label>
+                                <pre style="background:#1E293B; font-size:0.75rem; color:#E2E8F0;">${f.latex}</pre>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger" style="padding:4px 8px; font-size:0.72rem; margin-top:10px;" onclick="removeFigureAssetElement(${idx})">Delete Asset</button>
+                    </div>
+                `;
+                container.appendChild(node);
+            });
+        }
+
+        function removeFigureAssetElement(idx) {
+            appState.figures.splice(idx, 1);
+            renderFiguresGalleryUI();
+            refreshStateIndicatorsUI();
+        }
+
+        // Tab 4 Analytical Performance Reviews
+        function renderValidationChecklist() {
+            const body = document.getElementById('validation-checklist-table');
+            body.innerHTML = '';
+            
+            let missingNodeKeys = [];
+            SECTION_KEYS_LIST.forEach(k => {
+                const text = appState.sections[k] || '';
+                const wc = getWordCount(text);
+                const statusStr = text.trim() ? 'Complete' : 'Missing';
+                if(!text.trim()) missingNodeKeys.push(SECTION_LABELS_MAP[k]);
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${SECTION_LABELS_MAP[k]}</strong></td>
+                    <td><span class="badge-${statusStr === 'Complete' ? 'complete' : 'pending'}">${statusStr}</span></td>
+                    <td>${wc} Words</td>
+                    <td>${SECTION_WEIGHTS_MAP[k]}%</td>
+                `;
+                body.appendChild(tr);
+            });
+
+            const warningBox = document.getElementById('validation-warnings-box');
+            warningBox.innerHTML = '';
+            if(missingNodeKeys.length > 0) {
+                warningBox.innerHTML += `<div class="warning-banner" style="background:#FEE2E2; border-left-color:#EF4444; color:#991B1B;"><strong>Missing Section Targets Structural Drift Warning:</strong> The document context layout lacks data nodes for: ${missingNodeKeys.join(', ')}. Fill out sections before distribution packaging.</div>`;
+            }
+            if(appState.citations.length < 5) {
+                warningBox.innerHTML += `<div class="warning-banner"><strong>Low Reference Ingestion Density:</strong> Only ${appState.citations.length} bibliographical markers exist. A fallback minimum threshold of 5 index positions is highly recommended to validate academic context layers.</div>`;
+            }
+        }
+
+        async function triggerRunValidationReport() {
+            const completedCount = countCompletedSections();
+            if(completedCount < 2) {
+                alert("Please provide draft components for at least two functional structural nodes before executing validation frameworks.");
+                return;
+            }
+            
+            captureFormSetupInputs();
+            const spinner = document.getElementById('validation-spinner');
+            spinner.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch('/api/run_validation', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        setup: appState.setup,
+                        sections: appState.sections,
+                        lit_papers: appState.lit_papers
+                    })
+                });
+                const resData = await response.json();
+                if(resData.error) {
+                    alert(resData.error);
+                } else {
+                    appState.validation_result = resData.validation_result;
+                    renderValidationReportBlockUI();
+                }
+            } catch(ex) {
+                console.error(ex);
+                alert("Analytical runtime connection timeout inside validation engine paths.");
+            } finally {
+                spinner.style.display = 'none';
+                refreshStateIndicatorsUI();
+            }
+        }
+
+        function renderValidationReportBlockUI() {
+            const block = document.getElementById('validation-results-render-block');
+            block.style.display = 'block';
+            block.innerHTML = '';
+            
+            const vr = appState.validation_result;
+            if(vr.raw) {
+                block.innerHTML = `<pre>${vr.raw}</pre>`;
+                return;
+            }
+            
+            const riskClass = `risk-${vr.overall_risk || 'Medium'}`;
+            
+            let stringsStrengths = (vr.strengths || []).map(s => `<li>${s}</li>`).join('');
+            let stringsWeaks = (vr.weak_sections || []).map(s => `<li>${s}</li>`).join('');
+            let stringsFlags = (vr.hallucination_flags || []).map(s => `<li>${s}</li>`).join('');
+            let stringsRecs = (vr.recommendations || []).map(s => `<li>${s}</li>`).join('');
+
+            block.innerHTML = `
+                <div class="card" style="background:#F8FAFC; border-left:4px solid #2563EB;">
+                    <h4>Overall Drifts / Hallucination Indexes Verification Risk</h4>
+                    <span class="${riskClass}" style="font-size:1.1rem; text-transform:uppercase;">${vr.overall_risk || 'Unknown'} Risk Vector</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div>
+                        <div class="card" style="margin-bottom:12px;"><h5>Strengths Identified</h5><ul>${stringsStrengths || '<li>None indicated.</li>'}</ul></div>
+                        <div class="card" style="margin-bottom:12px;"><h5>Structural Weaknesses</h5><ul>${stringsWeaks || '<li>None indicated.</li>'}</ul></div>
+                    </div>
+                    <div>
+                        <div class="card" style="margin-bottom:12px;"><h5>Potentially Unsupported Core Statements</h5><ul>${stringsFlags || '<li>No flag criteria raised. Integrity verification green.</li>'}</ul></div>
+                        <div class="card" style="margin-bottom:12px;"><h5>Peer Review Recommendations</h5><ul>${stringsRecs || '<li>None generated.</li>'}</ul></div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top:12px;">
+                    <h5>Citation Adequacy Notes</h5>
+                    <p style="font-size:0.9rem; color:#475569; margin-top:6px;">${vr.reference_note || 'N/A'}</p>
+                </div>
+            `;
+        }
+
+        // Tab 5 Layout Compilation Mapping Drivers
+        function getAuthorLatexFormattingBlock() {
+            let lines = [];
+            appState.authors.forEach(a => {
+                if(a.name) lines.push(`\\author{${a.name}} \\affil{${a.department || ''}, ${a.college || ''}}`);
+            });
+            return lines.length > 0 ? lines.join('\n') : '\\author{Author Name}';
+        }
+
+        function generateLocalTexTemplateSimulationString() {
+            const formatStyle = appState.setup.format_style || "IEEE";
+            let template = `\\documentclass{article}\n\\begin{document}\n\\title{${appState.setup.title || 'Research Title'}}\n\\maketitle\n`;
+            
+            // Replicate structure mapping calculations identically
+            const authorStr = getAuthorLatexFormattingBlock();
+            const titleStr = appState.setup.title || "Research Title";
+            const journalStr = appState.setup.journal || "Journal Name";
+            
+            const abstractStr = appState.sections.abstract || "";
+            const introStr = appState.sections.introduction || "";
+            const litStr = appState.sections.literature_review || "";
+            const methStr = appState.sections.methodology || "";
+            const resStr = appState.sections.results || "";
+            const discStr = appState.sections.discussion || "";
+            const concStr = appState.sections.conclusion || "";
+
+            // Mapping exact structural fallback patterns mimicking python dictionaries
+            const RAW_SIMULATED_TEMPLATES = {
+                "IEEE": `\\documentclass[conference]{IEEEtran}\n\\usepackage{cite}\n\\usepackage{amsmath,amssymb,amsfonts}\n\\usepackage{graphicx}\n\\title{${titleStr}}\n${authorStr}\n\\begin{document}\n\\maketitle\n\\begin{abstract}\n${abstractStr}\n\\end{abstract}\n\\section{Introduction}\n${introStr}\n\\section{Related Work}\n${litStr}\n\\section{Methodology}\n${methStr}\n\\section{Results}\n${resStr}\n\\section{Discussion}\n${discStr}\n\\section{Conclusion}\n${concStr}\n\\bibliographystyle{IEEEtran}\n\\bibliography{references}\n\\end{document}`,
+                "Springer": `\\documentclass{svjour3}\n\\usepackage{graphicx}\n\\usepackage{cite}\n\\title{${titleStr}}\n${authorStr}\n\\begin{document}\n\\maketitle\n\\begin{abstract}\n${abstractStr}\n\\end{abstract}\n\\section{Introduction}\n${introStr}\n\\section{Literature Review}\n${litStr}\n\\section{Methodology}\n${methStr}\n\\section{Results}\n${resStr}\n\\section{Discussion}\n${discStr}\n\\section{Conclusion}\n${concStr}\n\\bibliographystyle{spbasic}\n\\bibliography{references}\n\\end{document}`,
+                "Elsevier": `\\documentclass[preprint,12pt]{elsarticle}\n\\usepackage{graphicx}\n\\usepackage{amssymb}\n\\usepackage{cite}\n\\journal{${journalStr}}\n\\begin{document}\n\\begin{frontmatter}\n\\title{${titleStr}}\n${authorStr}\n\\begin{abstract}\n${abstractStr}\n\\end{abstract}\n\\end{frontmatter}\n\\section{Introduction}\n${introStr}\n\\section{Literature Review}\n${litStr}\n\\section{Methodology}\n${methStr}\n\\section{Results}\n${resStr}\n\\section{Discussion}\n${discStr}\n\\section{Conclusion}\n${concStr}\n\\bibliographystyle{elsarticle-num}\n\\bibliography{references}\n\\end{document}`,
+                "College Format": `\\documentclass[12pt,a4paper]{article}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{graphicx}\n\\usepackage{cite}\n\\usepackage{setspace}\n\\doublespacing\n\\title{${titleStr}}\n${authorStr}\n\\date{\\today}\n\\begin{document}\n\\maketitle\n\\begin{abstract}\n${abstractStr}\n\\end{abstract}\n\\section{Introduction}\n${introStr}\n\\section{Literature Review}\n${litStr}\n\\section{Methodology}\n${methStr}\n\\section{Results}\n${resStr}\n\\section{Discussion}\n${discStr}\n\\section{Conclusion}\n${concStr}\n\\bibliographystyle{plain}\n\\bibliography{references}\n\\end{document}`
+            };
+
+            return RAW_SIMULATED_TEMPLATES[formatStyle] || RAW_SIMULATED_TEMPLATES["College Format"];
+        }
+
+        function generateLocalBibString() {
+            let lines = [];
+            appState.citations.forEach(c => { if(c.bibtex) lines.push(c.bibtex); });
+            return lines.length > 0 ? lines.join('\n\n') : '% No references added yet.';
+        }
+
+        function generateLocalMetadataJson() {
+            const completedCount = countCompletedSections();
+            const currentScore = calculateMetricsScore();
+            return JSON.stringify({
+                title: appState.setup.title || "",
+                domain: appState.setup.domain || "",
+                keywords: appState.setup.keywords || "",
+                authors: appState.authors,
+                journal: appState.setup.journal || "",
+                format_style: appState.setup.format_style || "IEEE",
+                sections_completed: completedCount,
+                readiness_score: currentScore,
+                references: appState.citations.length,
+                generated_at: new Date().toISOString()
+            }, null, 2);
+        }
+
+        function updateExportPreviews() {
+            document.getElementById('code-preview-tex').innerText = generateLocalTexTemplateSimulationString();
+            document.getElementById('code-preview-bib').innerText = generateLocalBibString();
+            document.getElementById('code-preview-meta').innerText = generateLocalMetadataJson();
+        }
+
+        async function triggerExportZipArchive() {
+            captureFormSetupInputs();
+            try {
+                const response = await fetch('/api/export_zip', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        setup: appState.setup,
+                        authors: appState.authors,
+                        sections: appState.sections,
+                        citations: appState.citations,
+                        figures: appState.figures
+                    })
+                });
+                
+                if(!response.ok) {
+                    alert("Failed to build distribution package streams.");
+                    return;
+                }
+                
+                const blobObj = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blobObj);
+                const anchor = document.createElement('a');
+                anchor.href = downloadUrl;
+                anchor.download = "ResearchProject.zip";
+                document.body.appendChild(anchor);
+                anchor.click();
+                anchor.remove();
+                window.URL.revokeObjectURL(downloadUrl);
+            } catch(e) {
+                console.error(e);
+                alert("Exception initializing document package delivery loops.");
+            }
+        }
+    </script>
+</body>
+</html>
